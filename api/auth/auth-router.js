@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const User = require('../user/user.model')
+const User = require('../user/user-model')
 const bcrypt = require('bcryptjs')
 const { tokenMaker } = require('./tokenMaker')
 const { BCRYPT_ROUNDS } = require('../../data/secrets')
