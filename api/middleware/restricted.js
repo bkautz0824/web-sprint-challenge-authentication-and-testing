@@ -1,5 +1,21 @@
-module.exports = (req, res, next) => {
-  next();
+const jwt = require("jsonwebtoken");
+const JWT_SECRET = require('../../data/secrets')
+
+
+const restricted =  (req, res, next) => {
+  const token = req.headers.authorization
+  if (!token) {
+      return next({ status: 401, message: "token required" })
+  }
+  console.log(token)
+  jwt.verify(token, JWT_SECRET.JWT_SECRET, async (err, decodedToken) => {
+      if (err) {
+          return next({ status: 401, message: "token invalid" })
+      } else {
+          req.decodedToken = decodedToken
+          next()
+      }
+  })
   /*
     IMPLEMENT
 
@@ -12,3 +28,5 @@ module.exports = (req, res, next) => {
       the response body should include a string exactly as follows: "token invalid".
   */
 };
+
+module.exports = restricted;

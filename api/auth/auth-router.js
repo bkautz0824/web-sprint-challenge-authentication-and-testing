@@ -1,7 +1,25 @@
 const router = require('express').Router();
+const User = require('../user/user.model')
+const bcrypt = require('bcryptjs')
+const { tokenMaker } = require('./tokenMaker')
+const { BCRYPT_ROUNDS } = require('../../data/secrets')
 
-router.post('/register', (req, res) => {
-  res.end('implement register, please!');
+router.post('/register', async (req, res) => {
+  try {
+    const { username, password } = req.body
+    const alreadyRegistered = username ? await User.findBy({ username }).first() : null
+    if (!username || !password) {
+      res.status(400).json({ message: "username and password required" })
+    } else if (alreadyRegistered) {
+      res.status(400).json({ message: "username taken" })
+    } else {
+      const hash = bcrypt.hashSync(password, BCRYPT_ROUNDS)
+      const newUser = await User.add({ username, password: hash });
+      res.status(201).json(newUser)
+    }
+  } catch (err) {
+    next(err)
+  }
   /*
     IMPLEMENT
     You are welcome to build additional middlewares to help with the endpoint's functionality.
@@ -30,7 +48,22 @@ router.post('/register', (req, res) => {
 });
 
 router.post('/login', (req, res) => {
-  res.end('implement login, please!');
+  if (!req.body.username || !req.body.password) {
+    res.status(401).json({ message: "username and password required" })
+    return
+  }
+  const { username, password } = req.body;
+  User.findBy({ username })
+    .then(([user]) => {
+      if (user && bcrypt.compareSync(password, user.password)) {
+        const token = tokenMaker(user);
+        res.status(200).json({ message: `welcome, ${user.username}`, token })
+      } else if (!username || !password) {
+        res.status(400).json({ message: "username and password required" })
+      } else {
+        next({ status: 401, message: 'invalid credentials' })
+      }
+    })
   /*
     IMPLEMENT
     You are welcome to build additional middlewares to help with the endpoint's functionality.

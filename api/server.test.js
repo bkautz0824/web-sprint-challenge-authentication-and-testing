@@ -20,7 +20,7 @@ afterAll(async () => {
 
 describe('POST /auth/register', () => {
     test('If missing password', async () => {
-        let res = await request(server).post('/api/auth/register').send({ username: 'lisa' });
+        let res = await request(server).post('/api/auth/register').send({ username: 'ben' });
         expect(res.body.message).toBe("username and password required");
      })
     
@@ -50,7 +50,7 @@ describe('GET /jokes', () => {
     })
 
     test('if token exists in authorization header', async () => {
-        let result = await request(server).get('/api/jokes').set('Authorization', tokenMaker({ id: 1, username: 'adam' }))
+        let result = await request(server).get('/api/jokes').set('Authorization', tokenMaker({ id: 1, username: 'Bennett' }))
         expect(result.status).toBe(200)
     })
 })
