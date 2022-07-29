@@ -1,7 +1,12 @@
 const router = require('express').Router()
 
 router.get('/', (req, res, next) => {
-    res.json('users')
+    res.json(
+        {
+            username: "bennett",
+            paswword:"kautz123"
+        }
+    )
 })
 
 module.exports = router
